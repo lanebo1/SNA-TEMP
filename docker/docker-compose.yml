@@ -37,6 +37,7 @@ services:
       - RABBITMQ_QUEUE=logs
       - RABBITMQ_USER=${RABBITMQ_USER:-guest}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - MONGO_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017/${MONGO_DATABASE:-logs_analysis_db}?authSource=admin
       - MONGO_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - MONGO_COLLECTION=logs_analysis
       - MONGO_USERNAME=${MONGO_USERNAME:-admin}
@@ -220,6 +221,7 @@ services:
     ports:
       - "8090:8090"
     environment:
+      - MONGO_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017/${MONGO_DATABASE:-logs_analysis_db}?authSource=admin
       - MONGO_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - MONGO_COLLECTION=logs_analysis
       - MONGO_USERNAME=${MONGO_USERNAME:-admin}
@@ -265,6 +267,7 @@ services:
     ports:
       - "8091:8091"
     environment:
+      - MONGO_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017/${MONGO_DATABASE:-logs_analysis_db}?authSource=admin
       - MONGO_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - MONGO_COLLECTION=logs_analysis
       - MONGO_USERNAME=${MONGO_USERNAME:-admin}
