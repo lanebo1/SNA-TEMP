@@ -24,7 +24,7 @@ cd Distributed-Log-Analysis-Framework
 Navigate to the docker directory and start all services:
 ```bash
 cd docker
-docker-compose up -d --build
+docker-compose --env-file .env up -d --build
 ```
 
 ### Step 3: Verify Services

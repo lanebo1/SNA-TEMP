@@ -7,13 +7,12 @@ services:
       - "27018:27017"
     environment:
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-password}
     command: >
       --auth
     healthcheck:
-      test: mongosh --quiet --eval "db.adminCommand('ping').ok" localhost:27017/test --username $$(cat /run/secrets/mongo_root_username) --password $$(cat /run/secrets/mongo_root_password) --authenticationDatabase admin
+      test: mongosh --quiet --eval "db.adminCommand('ping').ok" localhost:27017/test --username ${MONGO_USERNAME:-admin} --password ${MONGO_PASSWORD:-password} --authenticationDatabase admin
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,13 +35,12 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_QUEUE=logs
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - MONGO_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - MONGO_COLLECTION=logs_analysis
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
+      - MONGO_USERNAME=${MONGO_USERNAME:-admin}
+      - MONGO_PASSWORD=${MONGO_PASSWORD:-password}
     healthcheck:
       test: ["CMD", "echo", "healthcheck"]
       interval: 10s
@@ -70,9 +68,8 @@ services:
       - SPRING_DATA_MONGODB_PORT=27017
       - SPRING_DATA_MONGODB_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
+      - SPRING_DATA_MONGODB_USERNAME=${MONGO_USERNAME:-admin}
+      - SPRING_DATA_MONGODB_PASSWORD=${MONGO_PASSWORD:-password}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
@@ -100,14 +97,13 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_QUEUE=logs
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - LOG_INTERVAL=0.001
       - BATCH_SIZE=50
       - NUM_THREADS=4
       - SERVER_PORT=8000
       - SERVER_ID=1
-    secrets:
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/metrics"]
       interval: 10s
@@ -132,14 +128,13 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_QUEUE=logs
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - LOG_INTERVAL=0.001
       - BATCH_SIZE=50
       - NUM_THREADS=4
       - SERVER_PORT=8000
       - SERVER_ID=2
-    secrets:
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/metrics"]
       interval: 10s
@@ -164,14 +159,13 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_QUEUE=logs
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - LOG_INTERVAL=0.001
       - BATCH_SIZE=50
       - NUM_THREADS=4
       - SERVER_PORT=8000
       - SERVER_ID=3
-    secrets:
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/metrics"]
       interval: 10s
@@ -203,11 +197,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      - RABBITMQ_DEFAULT_USER_FILE=/run/secrets/rabbitmq_default_user
-      - RABBITMQ_DEFAULT_PASS_FILE=/run/secrets/rabbitmq_default_pass
-    secrets:
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s
@@ -231,17 +222,16 @@ services:
     environment:
       - MONGO_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - MONGO_COLLECTION=logs_analysis
+      - MONGO_USERNAME=${MONGO_USERNAME:-admin}
+      - MONGO_PASSWORD=${MONGO_PASSWORD:-password}
       - CHECK_INTERVAL=30
       - PYTHON_SERVER_METRICS_URL=http://test-servers-1:8000/metrics,http://test-servers-2:8000/metrics,http://test-servers-3:8000/metrics
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_QUEUE=logs
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - METRICS_PORT=8090
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/metrics"]
       interval: 10s
@@ -277,19 +267,18 @@ services:
     environment:
       - MONGO_DATABASE=${MONGO_DATABASE:-logs_analysis_db}
       - MONGO_COLLECTION=logs_analysis
+      - MONGO_USERNAME=${MONGO_USERNAME:-admin}
+      - MONGO_PASSWORD=${MONGO_PASSWORD:-password}
       - CHECK_INTERVAL=30
       - PYTHON_SERVER_METRICS_URL=http://test-servers-1:8000/metrics,http://test-servers-2:8000/metrics,http://test-servers-3:8000/metrics
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_QUEUE=logs
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - METRICS_PORT=8091
       - PERFORMANCE_THRESHOLD_WARNING=500
       - PERFORMANCE_THRESHOLD_CRITICAL=1000
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
-      - rabbitmq_default_user
-      - rabbitmq_default_pass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8091/metrics"]
       interval: 10s
@@ -324,9 +313,8 @@ services:
       - ME_CONFIG_MONGODB_SERVER=mongodb
       - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USER:-admin}
       - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASS:-admin}
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_USERNAME:-admin}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_PASSWORD:-password}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -379,8 +367,8 @@ services:
       - ../test-servers/grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     depends_on:
@@ -406,13 +394,3 @@ networks:
     driver: bridge
   frontend_network:
     driver: bridge
-
-secrets:
-  mongo_root_username:
-    file: ./secrets/mongo_root_username.txt
-  mongo_root_password:
-    file: ./secrets/mongo_root_password.txt
-  rabbitmq_default_user:
-    file: ./secrets/rabbitmq_default_user.txt
-  rabbitmq_default_pass:
-    file: ./secrets/rabbitmq_default_pass.txt
